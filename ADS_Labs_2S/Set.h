@@ -6,10 +6,21 @@ struct Tree {
 	Tree* left;
 	Tree* right;
 	unsigned height;
+	Tree(int _key) : key(_key), left(nullptr), right(nullptr), height(1) {};
 };
 
 class Set {
 	Tree* root;
+	Tree* _Insert(Tree* root, int key);
+	Tree* _Erase_elem(Tree* root, int key);
+	void _Delete_tree(Tree* root);
+	void _Print(Tree* root, int step) const;
+	unsigned _Height(Tree* root);
+	void _Fix_height(Tree* root);
+	int _Balance_factor(Tree* root);
+	Tree* _Balance(Tree* root);
+	Tree* _Rotate_left(Tree* root);
+	Tree* _Rotate_right(Tree* root);
 public:
 	Set();
 	~Set();
