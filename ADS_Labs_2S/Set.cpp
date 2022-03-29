@@ -63,7 +63,7 @@ void Set::_Print(Tree* root, int step) const
 	{
 		_Print(root->right, step + 1);
 		for (int i = 0; i < step; i++) 
-			cout << "---";
+			cout << "--- ";
 		cout << root->key << std::endl;
 		_Print(root->left, step + 1);
 	}
