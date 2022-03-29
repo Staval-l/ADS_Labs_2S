@@ -34,15 +34,15 @@ Tree* Set::_Erase_elem(Tree* root, int key)
 	}
 	else
 	{
-		/*Tree* temp_l = root->left;
+		Tree* temp_l = root->left;
 		Tree* temp_r = root->right;
 		delete root;
 		if (!temp_r) return temp_l;
 		if (!temp_l) return temp_r;
-		Tree* min = find_min(temp_r);
-		min->right = erase_min(temp_r);
+		Tree* min = _Find_min(temp_r);
+		min->right = _Erase_min(temp_r);
 		min->left = temp_l;
-		return _Balance(min);*/
+		return _Balance(min);
 	}
 	return _Balance(root);
 }
@@ -137,6 +137,26 @@ Tree* Set::_Rotate_right(Tree* root)
 	_Fix_height(root);
 	_Fix_height(temp);
 	return temp;
+}
+
+Tree* Set::_Find_min(Tree* root)
+{
+	if (root->left)
+	{
+		return _Find_min(root->left);
+	}
+	else
+	{
+		return root;
+	}
+}
+
+Tree* Set::_Erase_min(Tree* root)
+{
+	if (root->left == nullptr)
+		return root->right;
+	root->left = _Erase_min(root->left);
+	return _Balance(root);
 }
 
 Set::Set()

@@ -21,6 +21,8 @@ class Set {
 	Tree* _Balance(Tree* root);
 	Tree* _Rotate_left(Tree* root);
 	Tree* _Rotate_right(Tree* root);
+	Tree* _Find_min(Tree* root);
+	Tree* _Erase_min(Tree* root);
 public:
 	Set();
 	~Set();
