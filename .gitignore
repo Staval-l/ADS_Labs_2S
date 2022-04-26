@@ -14,6 +14,8 @@
 *.sln
 ADS_Labs_2S.vcxproj.filters
 ADS_Labs_2S.sln
+Set.h
+Set.cpp
 
 # User-specific files (MonoDevelop/Xamarin Studio)
 *.userprefs
