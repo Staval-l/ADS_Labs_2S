@@ -52,9 +52,9 @@ Stats Shell_Sort(vector<int>& value)
 	return res;
 }
 
-std::vector<int> Merge(std::vector<int>& v1, std::vector<int>& v2, Stats& stat)
+vector<int> Merge(vector<int>& v1, vector<int>& v2, Stats& stat)
 {
-	std::vector<int> ret(v1.size() + v2.size()); 
+	vector<int> ret(v1.size() + v2.size()); 
 	size_t i = 0; 
 	size_t j = 0; 
 	size_t k = 0; 
@@ -94,10 +94,10 @@ std::vector<int> Merge(std::vector<int>& v1, std::vector<int>& v2, Stats& stat)
 	return ret;
 }
 
-Stats Naturial_Two_Way_Merge_Sort(std::vector<int>& value, Stats stat)
+Stats Naturial_Two_Way_Merge_Sort(vector<int>& value, Stats stat)
 {
 	if (value.size() == 1) return stat;
-	std::vector<int> tmp(value.size());
+	vector<int> tmp(value.size());
 	bool count = true; 
 	size_t l_old = 0; 
 	size_t r_old = value.size() - 1;
@@ -105,8 +105,8 @@ Stats Naturial_Two_Way_Merge_Sort(std::vector<int>& value, Stats stat)
 	size_t r_new = value.size() - 1;
 	while (l_old < r_old)
 	{
-		std::vector<int> tmp_1;
-		std::vector<int> tmp_2;
+		vector<int> tmp_1;
+		vector<int> tmp_2;
 		while ((value[l_old] <= value[l_old + 1]) && (l_old < r_old) && (l_old < value.size()))
 		{
 			tmp_1.push_back(value[l_old]);
@@ -126,7 +126,7 @@ Stats Naturial_Two_Way_Merge_Sort(std::vector<int>& value, Stats stat)
 			tmp_2.push_back(value[r_old]);
 			r_old--;
 		}
-		std::vector<int> tmp_0;
+		vector<int> tmp_0;
 		tmp_0 = Merge(tmp_1, tmp_2, stat);
 		if (count)
 		{
@@ -136,6 +136,7 @@ Stats Naturial_Two_Way_Merge_Sort(std::vector<int>& value, Stats stat)
 				i++;
 				stat.copy_count++;
 			}
+			l_new = l_new + tmp_0.size();
 			count = false;
 		}
 		else 
@@ -146,6 +147,7 @@ Stats Naturial_Two_Way_Merge_Sort(std::vector<int>& value, Stats stat)
 				i++;
 				stat.copy_count++;
 			}
+			r_new = r_new - tmp_0.size();
 			count = true;
 		}
 		if (tmp_0.size() == value.size())
@@ -193,24 +195,28 @@ int main()
 	}
 	cout << endl << endl;
 
-	std::vector<int> v3(15);
+	vector<int> v3(3);
 	for (auto i = v3.begin(); i != v3.end(); ++i)
 	{
-		*i = rand() % 10;
+		cin >> *i;
 	}
+	/*for (auto i = v3.begin(); i != v3.end(); ++i)
+	{
+		*i = rand() % 100;
+	}*/
 	for (auto i = v3.begin(); i != v3.end(); ++i)
 	{
-		std::cout << *i << " ";
+		cout << *i << " ";
 	}
-	std::cout << "\n";
+	cout << "\n";
 	Stats null;
 	s = Naturial_Two_Way_Merge_Sort(v3, null);
-	std::cout << "Number of comparisons:" << s.compare_count << std::endl;
-	std::cout << "Number of copies:" << s.copy_count << std::endl;
+	cout << "Number of comparisons: " << s.compare_count << endl;
+	cout << "Number of copies: " << s.copy_count << endl;
 	for (auto i = v3.begin(); i != v3.end(); ++i)
 	{
 		std::cout << *i << " ";
 	}
-	std::cout << "\n";
+	cout << "\n";
 	return 0;
 }
