@@ -95,4 +95,19 @@ public:
         }
     }
 
+    void Print() {
+        for (size_t i = 0; i < example.size(); ++i) {
+            cout << "Info: " << endl;
+            cout << "City: " << example[i].data << endl;
+            cout << "Roads from this city:" << endl;
+            if (example[i].edges.begin() == table[i].edges.end()) {
+                cout << "No roads" << endl;
+            }
+            for (auto elem : example[i].edges) {
+                cout << "   " << "Destination: " << elem.dest << "---" << "Length: " << elem.data << endl;
+            }
+            cout << endl;
+        }
+    }
+
 };
