@@ -25,7 +25,8 @@ int main()
     elem.Add_Edge("Saint-Peterburg", "Vladivostok", 11987);
 
     elem.Print();
-
+    cout << "===========================" << endl;
+    elem.BFS("Samara");
     cout << "===========================" << endl;
     elem.Delete_Edge("Samara", "Saint-Peterburg");
     elem.Print();
@@ -42,7 +43,6 @@ int main()
     elem.Delete_Vertex("Kiev");
     elem.Print();
     cout << "===========================" << endl;
-    elem.BFS("Samara");
-
+    
 	return 0;
 }
