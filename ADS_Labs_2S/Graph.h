@@ -158,7 +158,7 @@ public:
         }
     }
 
-    void Dijkstra(const TVertex& src, const TVertex& dst)
+    void Dijkstra(const TVertex& from, const TVertex& dest)
     {
 
     }
