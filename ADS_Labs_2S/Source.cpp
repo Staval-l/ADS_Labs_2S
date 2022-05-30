@@ -29,6 +29,20 @@ int main()
     cout << "===========================" << endl;
     elem.Delete_Edge("Samara", "Saint-Peterburg");
     elem.Print();
+    cout << "===========================" << endl;
+    try
+    {
+        elem.Delete_Vertex("Kev");
+    }
+    catch (const char* err)
+    {
+        cout << err << endl;
+    }
+    cout << "===========================" << endl;
+    elem.Delete_Vertex("Kiev");
+    elem.Print();
+    cout << "===========================" << endl;
+    elem.BFS("Samara");
 
 	return 0;
 }

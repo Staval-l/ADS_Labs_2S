@@ -3,8 +3,7 @@
 #include <iostream>
 #include <vector>
 #include <list>
-//#include <exception>
-//#include <queue>
+#include <queue>
 //#include <map>
 
 using namespace std;
@@ -54,19 +53,21 @@ public:
         if (Get_ID(source) == -1) {
             example.push_back(Vertex(source));
         }
-        else throw exception();
+        else 
+            throw "This city has already been built";
     }
 
     void Add_Edge(const TVertex& source, const TVertex& destination, const TEdge& new_edge) {
         int id_source = Get_ID(source);
         int id_destination = Get_ID(destination);
-        if ((id_source == -1) || (id_destination == -1)) throw exception();
+        if ((id_source == -1) || (id_destination == -1)) 
+            throw "This road has already been built";
         example[id_source].edges.push_back(Edge(new_edge, destination));
     }
 
     void Delete_Vertex(const TVertex& target) {
         int id_vertex = Get_ID(target);
-        if (id_vertex == -1) throw exception();
+        if (id_vertex == -1) throw "There is no such city";
         for (auto it_vertex = example.begin(); it_vertex != example.end(); ) {
             if (it_vertex->data == target) {
                 it_vertex = example.erase(it_vertex);
@@ -85,7 +86,8 @@ public:
     void Delete_Edge(const TVertex& source, const TVertex& destination) {
         int id_source = Get_ID(source);
         int id_destination = Get_ID(destination);
-        if ((id_source == -1) || (id_destination == -1)) throw exception();
+        if ((id_source == -1) || (id_destination == -1)) 
+            throw "This is no such road";
         for (auto it = example[id_source].edges.begin(); it != example[id_source].edges.end(); ) {
             if (it->dest == destination) {
                 example[id_source].edges.erase(it);
@@ -107,6 +109,30 @@ public:
                 cout << "   " << "Destination: " << elem.dest << " ===> " << "Length: " << elem.data << " km" << endl;
             }
             cout << endl;
+        }
+    }
+
+    void BFS(const TVertex& from) {
+        if (Get_ID(from) == -1) 
+            throw "There is no such city";
+        for (auto elem : example) {
+            elem.colour = false;
+        }
+        queue<Vertex> q;
+        Vertex s = example[Get_ID(from)];
+        q.push(s);
+        s.colour = true;
+        while (!q.empty()) {
+            Vertex u = q.front();
+            q.pop();
+            for (auto elem : u.edges) {
+                Vertex& v = example[Get_ID(elem.dest)];
+                if (v.colour == false) {
+                    v.colour = true;
+                    q.push(v);
+                }
+            }
+            cout << u.data << endl;
         }
     }
 
