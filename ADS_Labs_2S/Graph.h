@@ -97,14 +97,14 @@ public:
 
     void Print() {
         for (size_t i = 0; i < example.size(); ++i) {
-            cout << "Info: " << endl;
-            cout << "City: " << example[i].data << endl;
+            cout << "City: " << endl;
+            cout << example[i].data << endl;
             cout << "Roads from this city:" << endl;
-            if (example[i].edges.begin() == table[i].edges.end()) {
+            if (example[i].edges.begin() == example[i].edges.end()) {
                 cout << "No roads" << endl;
             }
             for (auto elem : example[i].edges) {
-                cout << "   " << "Destination: " << elem.dest << "---" << "Length: " << elem.data << endl;
+                cout << "   " << "Destination: " << elem.dest << " ===> " << "Length: " << elem.data << " km" << endl;
             }
             cout << endl;
         }
