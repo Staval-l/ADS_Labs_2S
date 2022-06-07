@@ -1,166 +1,367 @@
 #pragma once
 
-#include <iostream>
 #include <vector>
-#include <list>
+#include <string>
+#include <iostream>
 #include <queue>
-//#include <map>
 
-using namespace std;
+using namespace std; // When I was recoding, I deleted that line
+					 // But then I put it back for convenience
+struct Edge 
+{
+	std::string dest;
+	double length;
+	Edge(const Edge& rhs) 
+	{
+		this->dest = rhs.dest;
+		this->length = rhs.length;
+	}
+	Edge& operator =(const Edge& rhs) 
+	{
+		if (this == &rhs) return *this;
+		this->dest = rhs.dest;
+		this->length = rhs.length;
+		return *this;
+	}
+	Edge() : dest(""), length(-1) {}
+	Edge(const std::string& dst, const double& l) :length(l), dest(dst) {}
+	operator double() const 
+	{
+		return length;
+	}
+};
 
-template<typename TVertex, typename TEdge>
-class Graph {
+struct Vertex 
+{
+	std::string id;
+	size_t amount;
+	bool colour;
+	Vertex()
+	{
+		id = "";
+		amount = 0;
+		colour = false;
+	}
+	Vertex(const Vertex& rhs) 
+	{
+		this->id = rhs.id;
+		this->amount = rhs.amount;
+		this->colour = rhs.colour;
+	}
+	Vertex& operator=(const Vertex& rhs) 
+	{
+		if (this == &rhs) return *this;
+		this->id = rhs.id;
+		this->amount = rhs.amount;
+		this->colour = rhs.colour;
+		return *this;
+	}
+	Vertex(const std::string& str, const size_t& am) : id(str), amount(am), colour(0) {}
+};
 
-    struct Edge {
-        TEdge data;
-        TVertex dest;
+template<>
+struct std::equal_to<Vertex> 
+{
+	size_t operator()(const Vertex& v1, const Vertex& v2) 
+	{
+		return((v1.id == v2.id) && (v1.amount == v2.amount));
+	}
+};
 
-        Edge(const TEdge& new_data, const TVertex& destination) : data(new_data), dest(destination) {}
+template <typename TVertex, typename TEdge, typename equal = std::equal_to<Vertex>>
+class Graph 
+{
+	std::vector<std::vector<TEdge>> edge;
+	std::vector<TVertex> vertex;
+	size_t count;
 
-        Edge(const Edge& rhs) {
-            data = rhs.data;
-            dest = rhs.dest;
-        }
-    };
+	bool check(std::vector<TVertex>& tmp, const std::string& str) const 
+	{
+		for (size_t i = 0; i < tmp.size(); ++i) 
+		{
+			if (str == tmp[i].id) return true;
+		}
+		return false;
+	}
 
-    struct Vertex {
-        TVertex data;
-        list<Edge> edges;
-        bool colour;
-
-        Vertex(const TVertex& data) : data(data), colour(false) {}
-
-        Vertex(const Vertex& rhs) {
-            data = rhs.data;
-            edges = rhs.edges;
-            colour = rhs.colour;
-        }
-    };
-
-    vector<Vertex> example;
+	int checker(const std::string& str) const 
+	{
+		for (size_t i = 0; i < vertex.size(); ++i) 
+		{
+			if (str == vertex[i].id) return i;
+		}
+		return -1;
+	}
+	
+	double dijkstr(std::vector<double>& length, std::vector<bool> checked, const TVertex& src, const TVertex& dst, std::vector<int>& parent) 
+	{
+		size_t new_min = checker(src.id);
+		checked[new_min] = true;
+		for (size_t i = 0; i < edge[new_min].size(); ++i) 
+		{
+			int ch = checker(edge[new_min][i].dest);
+			if (length[ch] > length[new_min] + double(edge[new_min][i])) 
+			{
+				length[ch] = length[new_min] + double(edge[new_min][i]);
+				parent[ch] = new_min;
+			}
+		}
+		double temp = -1;
+		int ind_min = -1;
+		for (size_t i = 0; i < edge[new_min].size(); ++i) 
+		{
+			size_t ch = checker(edge[new_min][i].dest);
+			if (checked[ch] == false) 
+			{
+				temp = length[ch];
+				ind_min = ch;
+				break;
+			}
+		}
+		for (size_t i = ind_min; i < edge[new_min].size(); ++i) 
+		{
+			int ch = checker(edge[new_min][i].dest);
+			if (checked[ch] == true) continue;
+			if (temp > length[ch]) 
+			{
+				ind_min = ch;
+				temp = length[ch];
+			}
+		}
+		if (ind_min == -1) 
+		{
+			bool flag = false;
+			for (size_t i = 0; i < checked.size(); ++i) 
+			{
+				if (checked[i] == false) 
+				{
+					ind_min = i;
+					flag = true;
+					break;
+				}
+			}
+			if (flag == false) 
+			{
+				return length[checker(dst.id)];
+			}
+		}
+		return dijkstr(length, checked, vertex[ind_min], dst, parent);
+	}
 
 public:
 
-    int Get_ID(const TVertex& target) const 
-    {
-        for (int i = 0; i < example.size(); ++i) 
-        {
-            if (example[i].data == target)
-                return i;
-        }
-        return -1;
-    }
+	Graph()
+	{
+		count = 0;
+	}
 
-    void Add_Vertex(const TVertex& source) 
-    {
-        if (Get_ID(source) == -1) 
-        {
-            example.push_back(Vertex(source));
-        }
-        else 
-            throw "This city has already been built";
-    }
+	int Get_ID(const TVertex& rhs) const
+	{
+		equal compare;
+		for (size_t i = 0; i < vertex.size(); ++i)
+		{
+			if (compare(rhs, vertex[i]))
+				return i;
+		}
+		return -1;
+	}
 
-    void Add_Edge(const TVertex& source, const TVertex& destination, const TEdge& new_edge) 
-    {
-        int id_source = Get_ID(source);
-        int id_destination = Get_ID(destination);
-        if ((id_source == -1) || (id_destination == -1)) 
-            throw "This road has already been built";
-        example[id_source].edges.push_back(Edge(new_edge, destination));
-    }
+	int Get_ID(const std::string& rhs) const
+	{
+		for (size_t i = 0; i < vertex.size(); ++i)
+		{
+			if (vertex[i].id == rhs)
+				return i;
+		}
+		return -1;
+	}
 
-    void Delete_Vertex(const TVertex& target) 
-    {
-        int id_vertex = Get_ID(target);
-        if (id_vertex == -1) throw "There is no such city";
-        for (auto it_vertex = example.begin(); it_vertex != example.end(); ) 
-        {
-            if (it_vertex->data == target) 
-            {
-                it_vertex = example.erase(it_vertex);
-            }
-            else 
-            {
-                for (auto it_edge = (*it_vertex).edges.begin();
-                    it_edge != (*it_vertex).edges.end(); ) 
-                {
-                    if (it_edge->dest == target) it_edge = (*it_vertex).edges.erase(it_edge);
-                    else ++it_edge;
-                }
-                ++it_vertex;
-            }
-        }
-    }
+	bool FindVertex(const TVertex& f) const 
+	{
+		equal compare;
+		for (auto it : vertex) 
+		{
+			if (compare(it, f)) return true;
+		}
+		return false;
+	}
+	
+	void AddVertex(const TVertex& newVertex) 
+	{
+		if (findVertex(newVertex) == true) return;
+		vertex.push_back(newVertex);
+		std::vector<TEdge> tmp(0);
+		edge.push_back(tmp);
+		count++;
+	}
 
-    void Delete_Edge(const TVertex& source, const TVertex& destination) 
-    {
-        int id_source = Get_ID(source);
-        int id_destination = Get_ID(destination);
-        if ((id_source == -1) || (id_destination == -1)) 
-            throw "This is no such road";
-        for (auto it = example[id_source].edges.begin(); it != example[id_source].edges.end(); ) 
-        {
-            if (it->dest == destination) 
-            {
-                example[id_source].edges.erase(it);
-                break;
-            }
-            else ++it;
-        }
-    }
+	void AddEdge(const TVertex& src, const TVertex& dst, const TEdge& newEdge)
+	{
+		if (findVertex(src) == false || findVertex(dst) == false) return;
+		equal compare;
+		for (size_t i = 0; i < vertex.size(); ++i)
+		{
+			if (compare(src, vertex[i]))
+			{
+				edge[i].push_back(newEdge);
+				return;
+			}
+		}
+	}
 
-    void Print() 
-    {
-        for (size_t i = 0; i < example.size(); ++i) 
-        {
-            cout << "City: " << endl;
-            cout << example[i].data << endl;
-            cout << "Roads from this city:" << endl;
-            if (example[i].edges.begin() == example[i].edges.end()) 
-            {
-                cout << "No roads" << endl;
-            }
-            for (auto elem : example[i].edges) 
-            {
-                cout << "   " << "Destination: " << elem.dest << " ===> " << "Length: " << elem.data << " km" << endl;
-            }
-            cout << endl;
-        }
-    }
+	void DeleteVertex(const TVertex& del) 
+	{
+		equal compare;
+		int ind = -1;
+		std::string temp;
+		for (size_t i = 0; i < vertex.size(); ++i) 
+		{
+			if (compare(vertex[i], del)) 
+			{
+				ind = i;
+				temp = vertex[i].id;
+				vertex.erase(vertex.begin() + i);
+				break;
+			}
+		}
+		if (ind == -1) return;
+		edge[ind].erase(edge[ind].begin(), edge[ind].end());
+		for (size_t i = 0; i < edge.size(); ++i) 
+		{
+			for (size_t j = 0; j < edge[i].size(); ++j) 
+			{
+				if (edge[i][j].dest == temp) 
+				{
+					edge[i].erase(edge[i].begin() + j);
+				}
+			}
+		}
+		--count;
+	}
 
-    void BFS(const TVertex& from) 
-    {
-        if (Get_ID(from) == -1) 
-            throw "There is no such city";
-        for (auto elem : example) 
-        {
-            elem.colour = false;
-        }
-        queue<Vertex> q;
-        Vertex s = example[Get_ID(from)];
-        q.push(s);
-        s.colour = true;
-        while (!q.empty()) 
-        {
-            Vertex u = q.front();
-            q.pop();
-            for (auto elem : u.edges) 
-            {
-                Vertex& v = example[Get_ID(elem.dest)];
-                if (v.colour == false) 
-                {
-                    v.colour = true;
-                    q.push(v);
-                }
-            }
-            cout << u.data << endl;
-        }
-    }
+	void DeleteEdge(const TVertex& src, const TVertex& dst) 
+	{
+		if (findVertex(src) == false || findVertex(dst) == false) return;
+		int ind = -1;
+		equal compare;
+		for (size_t i = 0; i < vertex.size(); ++i) 
+		{
+			if (compare(vertex[i], src)) 
+			{
+				ind = i;
+				break;
+			}
+		}
+		for (size_t i = 0; i < edge[ind].size(); ++i) 
+		{
+			if (edge[ind][i].dest == dst.id) 
+			{
+				edge[ind].erase(edge[ind].begin() + i);
+			}
+		}
+	}
 
-    void Dijkstra(const TVertex& from, const TVertex& dest)
-    {
+	void Print()
+	{
+		for (size_t i = 0; i < count; ++i)
+		{
+			cout << "City: " << endl;
+			cout << vertex[i].id << endl;
+			cout << "Population: " << endl;
+			cout << vertex[i].amount << " mln. people" << endl;
+			cout << "Roads from this city:" << endl;
+			for (size_t j = 0; j < edge[i].size(); ++j)
+			{
+				std::cout << "Destination: " << " ===> " << edge[i][j].dest << " - Lenght: " << edge[i][j].length << std::endl;
+			}
+			std::cout << "================" << std::endl;
+		}
+	}
 
-    }
+	void BFS(const TVertex& from)
+	{
+		if (Get_ID(from) == -1) 
+			throw "There is no such city";
+		for (auto elem : vertex) 
+		{
+		    elem.colour = false;
+		}
+		std::queue<Vertex> q;
+		equal compare;
+		Vertex s;
+		for (size_t i = 0; i < vertex.size(); ++i) {
+			if (compare(vertex[i], from)) {
+				s = vertex[i];
+				vertex[i].colour = true;
+				break;
+			}
+		}
+		q.push(s);
+		while (!q.empty())
+		{
+			Vertex u = q.front();
+			q.pop();
+			int t = Get_ID(u);
+			for (auto elem : edge[t])
+			{
+				Vertex& v = vertex[Get_ID(elem.dest)];
+				if (v.colour == false)
+				{
+					v.colour = true;
+					q.push(v);
+				}
+			}
+			cout << u.id << endl;
+		}
+	}
 
+	std::vector<TVertex> Dijkstra(const TVertex& src, const TVertex& dst) 
+	{
+		std::vector<TVertex> path_to_dst;
+		if (findVertex(src) == false || findVertex(dst) == false) return path_to_dst;
+		std::vector<int> parent(vertex.size(), -1);
+		std::vector<double> length(vertex.size());
+		std::vector<bool> checked(vertex.size(), false);
+		int new_min = checker(src.id);
+		for (size_t i = 0; i < length.size(); ++i) 
+		{
+			if (i == new_min) continue;
+			length[i] = INT32_MAX;
+		}
+		length[checker(src.id)] = 0;
+		checked[checker(src.id)] = true;
+		double result = dijkstr(length, checked, src, dst, parent);
+		if (result == INT32_MAX) 
+		{
+			std::cout << "Path doesnt exist" << std::endl;
+			return path_to_dst;
+		}
+		std::vector<int> path;
+		for (int v = checker(dst.id); v != -1; v = parent[v]) 
+		{
+			path.push_back(v);
+		}
+		reverse(path.begin(), path.end());
+		std::cout << "path:";
+		for (size_t i = 0; i < path.size(); ++i) 
+		{
+			path_to_dst.push_back(vertex[path[i]]);
+		}
+		for (size_t i = 0; i < path.size() - 1; ++i) 
+		{
+			int ch = checker(path_to_dst[i].id);
+			double sum = 0;
+			for (size_t j = 0; j < edge[ch].size(); ++j) 
+			{
+				if (path_to_dst[i + 1].id == edge[ch][j].dest) 
+				{
+					sum = double(edge[ch][j]);
+					break;
+				}
+			}
+			std::cout << "From: " << path_to_dst[i].id << " | to: " << path_to_dst[i + 1].id << std::endl;
+		}
+		std::cout << std::endl << "Overall Length:" << result << std::endl;
+		return path_to_dst;
+	}
 };
