@@ -188,7 +188,7 @@ public:
 	
 	void AddVertex(const TVertex& newVertex) 
 	{
-		if (findVertex(newVertex) == true) return;
+		if (FindVertex(newVertex) == true) return;
 		vertex.push_back(newVertex);
 		std::vector<TEdge> tmp(0);
 		edge.push_back(tmp);
@@ -197,7 +197,7 @@ public:
 
 	void AddEdge(const TVertex& src, const TVertex& dst, const TEdge& newEdge)
 	{
-		if (findVertex(src) == false || findVertex(dst) == false) return;
+		if (FindVertex(src) == false || FindVertex(dst) == false) return;
 		equal compare;
 		for (size_t i = 0; i < vertex.size(); ++i)
 		{
@@ -241,7 +241,7 @@ public:
 
 	void DeleteEdge(const TVertex& src, const TVertex& dst) 
 	{
-		if (findVertex(src) == false || findVertex(dst) == false) return;
+		if (FindVertex(src) == false || FindVertex(dst) == false) return;
 		int ind = -1;
 		equal compare;
 		for (size_t i = 0; i < vertex.size(); ++i) 
@@ -265,7 +265,7 @@ public:
 	{
 		for (size_t i = 0; i < count; ++i)
 		{
-			cout << "City: " << endl;
+			cout << "City: " << endl << endl;
 			cout << vertex[i].id << endl;
 			cout << "Population: " << endl;
 			cout << vertex[i].amount << " mln. people" << endl;
@@ -274,8 +274,9 @@ public:
 			{
 				std::cout << "Destination: " << " ===> " << edge[i][j].dest << " - Lenght: " << edge[i][j].length << std::endl;
 			}
-			std::cout << "================" << std::endl;
+			std::cout << "================" << std::endl << endl;
 		}
+		cout << "||||||||||||||||||||" << endl;
 	}
 
 	void BFS(const TVertex& from)
@@ -313,12 +314,13 @@ public:
 			}
 			cout << u.id << endl;
 		}
+		cout << "||||||||||||||||||||" << endl;
 	}
 
 	std::vector<TVertex> Dijkstra(const TVertex& src, const TVertex& dst) 
 	{
 		std::vector<TVertex> path_to_dst;
-		if (findVertex(src) == false || findVertex(dst) == false) return path_to_dst;
+		if (FindVertex(src) == false || FindVertex(dst) == false) return path_to_dst;
 		std::vector<int> parent(vertex.size(), -1);
 		std::vector<double> length(vertex.size());
 		std::vector<bool> checked(vertex.size(), false);
@@ -342,7 +344,7 @@ public:
 			path.push_back(v);
 		}
 		reverse(path.begin(), path.end());
-		std::cout << "path:";
+		std::cout << "Best path: " << endl;
 		for (size_t i = 0; i < path.size(); ++i) 
 		{
 			path_to_dst.push_back(vertex[path[i]]);
@@ -361,7 +363,7 @@ public:
 			}
 			std::cout << "From: " << path_to_dst[i].id << " | to: " << path_to_dst[i + 1].id << std::endl;
 		}
-		std::cout << std::endl << "Overall Length:" << result << std::endl;
+		std::cout << std::endl << "Best way: " << result << std::endl;
 		return path_to_dst;
 	}
 };
